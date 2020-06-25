@@ -3,19 +3,24 @@ jobs:
   include:
   - os: linux
     dist: bionic
-    name: Linux E+ Tests
+    name: Ubuntu 18.04 Tests
     language: python
     python: 3.6
     before_script: pip3 install -r requirements.txt
     script: python3 setup.py run
   - os: osx
-    name: Mac E+ Tests
+    name: OSX 10.14.6
     osx_image: xcode11.2
+    before_script: pip3 install -r requirements.txt
+    script: python3 setup.py run
+  - os: osx
+    name: OSX 10.15.4
+    osx_image: xcode11.6
     before_script: pip3 install -r requirements.txt
     script: python3 setup.py run
   - os: windows
     language: cpp  # just for fun?
-    name: Windows E+ Tests
+    name: Windows
     before_script:
       - choco install python --version 3.6.8
       - pip3 install -r requirements.txt
