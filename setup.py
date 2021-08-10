@@ -29,7 +29,7 @@ class Runner(distutils.cmd.Command):
             raise Exception("Parameter --run_config has invalid value, see options in config.py")
 
     def run(self):
-        verbose = False
+        verbose = True
         c = TestConfiguration(self.run_config)
         self.announce('Attempting to test tag name: %s' % c.tag_this_version, level=distutils.log.INFO)
         d = Downloader(c, self.announce)
