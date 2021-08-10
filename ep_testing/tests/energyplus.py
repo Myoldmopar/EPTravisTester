@@ -1,5 +1,5 @@
 import os
-from subprocess import check_call, CalledProcessError, STDOUT
+import subprocess
 
 from ep_testing.exceptions import EPTestingException
 from ep_testing.tests.base import BaseTest
@@ -17,7 +17,6 @@ class TestPlainDDRunEPlusFile(BaseTest):
         print('* Running test class "%s" on file "%s"... ' % (self.__class__.__name__, test_file), end='')
         eplus_binary = os.path.join(install_root, 'energyplus')
         idf_path = os.path.join(install_root, 'ExampleFiles', test_file)
-        dev_null = open(os.devnull, 'w')
         if 'binary_sym_link' in kwargs:
             eplus_binary_to_use = os.path.join(os.getcwd(), 'ep_symlink')
             if verbose:
@@ -27,8 +26,14 @@ class TestPlainDDRunEPlusFile(BaseTest):
             os.symlink(eplus_binary, eplus_binary_to_use)
         else:
             eplus_binary_to_use = eplus_binary
-        try:
-            check_call([eplus_binary_to_use, '-D', idf_path], stdout=dev_null, stderr=STDOUT)
+
+        r = subprocess.run([eplus_binary_to_use, '-D', idf_path],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if r.returncode == 0:
             print(' [DONE]!')
-        except CalledProcessError:
-            raise EPTestingException('EnergyPlus failed!')
+        else:
+            raise EPTestingException(
+                'EnergyPlus failed!\n'
+                'stderr:\n{}'
+                '\n\n'
+                'stdout:\n{}'.format(r.stderr, r.stdout))
