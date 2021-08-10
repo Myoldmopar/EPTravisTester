@@ -24,13 +24,13 @@ def my_check_call(verbose: bool, command_line: List[str], **kwargs) -> None:
     if r.returncode == 0 and verbose:
         print(r.stderr.decode().strip())
     else:
-        raise CalledProcessError(
-            r.returncode, command_line,
-            'Command failed!\n'
-            'stderr:\n{}'
+        raise EPTestingException(
+            f'Command {command_line} failed with exit status {r.returncode}!\n'
+            'stderr:\n'
+            f'{r.stderr.decode().strip()}'
             '\n\n'
-            'stdout:\n{}'.format(r.stderr.decode().strip(),
-                                 r.stdout.decode().strip()))
+            'stdout:\n'
+            f'{r.stdout.decode().strip()}')
 
 
 class TestPythonAPIAccess(BaseTest):
@@ -74,7 +74,7 @@ class TestPythonAPIAccess(BaseTest):
                 my_env["PATH"] = install_root + ";" + my_env["PATH"]
             my_check_call(self.verbose, [py, python_file_path], env=my_env)
             print(' [DONE]!')
-        except CalledProcessError as e:
+        except EPTestingException as e:
             print('Python API Wrapper Script failed!')
             raise e
 
@@ -99,7 +99,7 @@ def make_build_dir_and_build(cmake_build_dir: str, verbose: bool, this_os: int, 
             command_line.extend(['--config', 'Release'])
         my_check_call(verbose, command_line, env=my_env, cwd=cmake_build_dir)
         print(' [COMPILED] ', end='')
-    except CalledProcessError as e:
+    except EPTestingException as e:
         print("C API Wrapper Compilation Failed!")
         raise e
 
@@ -174,7 +174,7 @@ class TestCAPIAccess(BaseTest):
                 new_binary_path = os.path.join(cmake_build_dir, 'Release', self.target_name + '.exe')
             command_line = [new_binary_path]
             my_check_call(self.verbose, command_line, cwd=install_root)
-        except CalledProcessError as e:
+        except EPTestingException as e:
             print('C API Wrapper Execution failed!')
             raise e
         print(' [DONE]!')
@@ -250,7 +250,7 @@ class TestCppAPIDelayedAccess(BaseTest):
             my_env["PATH"] = install_root + ";" + my_env["PATH"]
         try:
             my_check_call(self.verbose, [built_binary_path], env=my_env)
-        except CalledProcessError as e:
+        except EPTestingException as e:
             print("Delayed C API Wrapper execution failed")
             raise e
         print(' [DONE]!')
