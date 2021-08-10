@@ -27,14 +27,17 @@ class TestPlainDDRunEPlusFile(BaseTest):
         else:
             eplus_binary_to_use = eplus_binary
 
-        r = subprocess.run([eplus_binary_to_use, '-D', idf_path],
+        cmd = [eplus_binary_to_use, '-D', idf_path]
+        r = subprocess.run(cmd,
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if r.returncode == 0:
             print(' [DONE]!')
         else:
             raise EPTestingException(
                 'EnergyPlus failed!\n'
-                'stderr:\n{}'
+                f'Command {cmd} failed with exit status {r.returncode}!\n'
+                'stderr:\n'
+                f'{r.stderr.decode().strip()}'
                 '\n\n'
-                'stdout:\n{}'.format(r.stderr.decode().strip(),
-                                     r.stdout.decode().strip()))
+                'stdout:\n'
+                f'{r.stdout.decode().strip()}')
