@@ -23,9 +23,9 @@ def my_check_call(verbose: bool, command_line: List[str], **kwargs) -> None:
                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
     if r.returncode == 0 and verbose:
         print(r.stderr.decode().strip())
-        print(' [DONE]!')
     else:
         raise CalledProcessError(
+            r.returncode, command_line,
             'Command failed!\n'
             'stderr:\n{}'
             '\n\n'
