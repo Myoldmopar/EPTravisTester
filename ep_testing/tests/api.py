@@ -74,8 +74,9 @@ class TestPythonAPIAccess(BaseTest):
                 my_env["PATH"] = install_root + ";" + my_env["PATH"]
             my_check_call(self.verbose, [py, python_file_path], env=my_env)
             print(' [DONE]!')
-        except CalledProcessError:
-            raise EPTestingException('Python API Wrapper Script failed!')
+        except CalledProcessError as e:
+            print('Python API Wrapper Script failed!')
+            raise e
 
 
 def make_build_dir_and_build(cmake_build_dir: str, verbose: bool, this_os: int, bitness: str):
@@ -98,9 +99,9 @@ def make_build_dir_and_build(cmake_build_dir: str, verbose: bool, this_os: int, 
             command_line.extend(['--config', 'Release'])
         my_check_call(verbose, command_line, env=my_env, cwd=cmake_build_dir)
         print(' [COMPILED] ', end='')
-    except CalledProcessError:
+    except CalledProcessError as e:
         print("C API Wrapper Compilation Failed!")
-        raise
+        raise e
 
 
 class TestCAPIAccess(BaseTest):
@@ -173,9 +174,9 @@ class TestCAPIAccess(BaseTest):
                 new_binary_path = os.path.join(cmake_build_dir, 'Release', self.target_name + '.exe')
             command_line = [new_binary_path]
             my_check_call(self.verbose, command_line, cwd=install_root)
-        except CalledProcessError:
+        except CalledProcessError as e:
             print('C API Wrapper Execution failed!')
-            raise
+            raise e
         print(' [DONE]!')
 
 
@@ -249,7 +250,7 @@ class TestCppAPIDelayedAccess(BaseTest):
             my_env["PATH"] = install_root + ";" + my_env["PATH"]
         try:
             my_check_call(self.verbose, [built_binary_path], env=my_env)
-        except CalledProcessError:
+        except CalledProcessError as e:
             print("Delayed C API Wrapper execution failed")
-            raise
+            raise e
         print(' [DONE]!')
