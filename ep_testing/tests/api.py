@@ -1,7 +1,6 @@
 import os
 import platform
 import subprocess
-from subprocess import CalledProcessError
 from tempfile import mkdtemp, mkstemp
 from typing import List
 
