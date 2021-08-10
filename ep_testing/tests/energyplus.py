@@ -36,4 +36,5 @@ class TestPlainDDRunEPlusFile(BaseTest):
                 'EnergyPlus failed!\n'
                 'stderr:\n{}'
                 '\n\n'
-                'stdout:\n{}'.format(r.stderr, r.stdout))
+                'stdout:\n{}'.format(r.stderr.decode().strip(),
+                                     r.stdout.decode().strip()))

@@ -1,6 +1,7 @@
 import os
 import platform
-from subprocess import check_call, CalledProcessError, STDOUT
+import subprocess
+from subprocess import CalledProcessError
 from tempfile import mkdtemp, mkstemp
 from typing import List
 
@@ -17,11 +18,19 @@ def api_resource_dir() -> str:
 
 
 def my_check_call(verbose: bool, command_line: List[str], **kwargs) -> None:
-    if verbose:
-        check_call(command_line, **kwargs)
+
+    r = subprocess.run(command_line,
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
+    if r.returncode == 0 and verbose:
+        print(r.stderr.decode().strip())
+        print(' [DONE]!')
     else:
-        with open(os.devnull, 'w') as dev_null:
-            check_call(command_line, stdout=dev_null, stderr=STDOUT, **kwargs)
+        raise CalledProcessError(
+            'Command failed!\n'
+            'stderr:\n{}'
+            '\n\n'
+            'stdout:\n{}'.format(r.stderr.decode().strip(),
+                                 r.stdout.decode().strip()))
 
 
 class TestPythonAPIAccess(BaseTest):
