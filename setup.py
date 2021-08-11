@@ -13,7 +13,10 @@ class Runner(distutils.cmd.Command):
     * the path to where you extracted the tar.gz/zip manually, and,
     * on windows: the version of MSVC to use
 
-    eg: `python setup.py run --verbose_output --run-config win64 --msvc-version 16 --extracted-install-path "C:\EnergyPlus-9.6.0-ed3a9d36c8-Windows-x86_64"`
+    eg: `python setup.py run --verbose_output
+                             --run-config win64
+                             --msvc-version 16
+                             --extracted-install-path "path/to/EnergyPlus-9.6.0-ed3a9d36c8-Windows-x86_64"`
 
     """
 
@@ -21,8 +24,10 @@ class Runner(distutils.cmd.Command):
     user_options = [
         # The format is (long option, short option, description).
         ('run-config=', None, 'Run configuration, see possible options in config.py'),
-        ('extracted-install-path=', 'x', 'Specifies a path where E+ is already extracted to skip downloading it (should be the path to the root folder that contains energyplus.exe'),
-        ('msvc-version=', None, 'For OS.Windows only, specifies a MSVC generator to use. 15 is default, you can override to 16'),
+        ('extracted-install-path=', 'x',
+         'Specifies a path where E+ is extracted to skip downloading it (path to root folder with energyplus.exe'),
+        ('msvc-version=', None,
+         'For OS.Windows only, specifies a MSVC generator to use. 15 is default, you can override to 16'),
         # distutils is already claiming --verbose and setting it as default = 1
         ('verbose-output', None, 'Enable verbose mode'),
     ]
@@ -43,7 +48,7 @@ class Runner(distutils.cmd.Command):
                 raise Exception("Parameter --msvc_version doesn't apply not non windows OS")
             try:
                 self.msvc_version = int(self.msvc_version)
-            except:
+            except ValueError:
                 raise Exception("Parameter --msvc_version should be an int like 15 (2017) or 16 (2019)")
 
         if self.verbose_output is None:
@@ -58,9 +63,10 @@ class Runner(distutils.cmd.Command):
         if self.extracted_install_path is None:
             d = Downloader(c, self.announce)
             self.extracted_install_path = d.extracted_install_path()
-            self.announce('EnergyPlus package extracted to: ' + self.extracted_install_path, level=distutils.log.INFO)
+            self.announce(f'EnergyPlus package extracted to: {self.extracted_install_path}', level=distutils.log.INFO)
         else:
-            self.announce('Using specified EnergyPlus package extracted at: ' + self.extracted_install_path, level=distutils.log.INFO)
+            self.announce(f'Using specified EnergyPlus package extracted at: {self.extracted_install_path}',
+                          level=distutils.log.INFO)
         t = Tester(c, self.extracted_install_path, self.verbose_output)
         # unhandled exceptions should cause this to fail
         t.run()

@@ -39,10 +39,12 @@ class Tester:
                 self.install_path, self.verbose, {'test_file': '1ZoneUncontrolled.idf', 'binary_sym_link': True}
             )
         TestCAPIAccess().run(
-            self.install_path, self.verbose, {'os': self.config.os, 'bitness': self.config.bitness, 'msvc_version': self.config.msvc_version}
+            self.install_path, self.verbose,
+            {'os': self.config.os, 'bitness': self.config.bitness, 'msvc_version': self.config.msvc_version}
         )
         TestCppAPIDelayedAccess().run(
-            self.install_path, self.verbose, {'os': self.config.os, 'bitness': self.config.bitness, 'msvc_version': self.config.msvc_version}
+            self.install_path, self.verbose,
+            {'os': self.config.os, 'bitness': self.config.bitness, 'msvc_version': self.config.msvc_version}
         )
         if self.config.bitness == 'x32':
             print("Travis does not have a 32-bit Python package readily available, so not testing Python API")

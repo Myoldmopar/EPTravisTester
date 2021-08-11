@@ -21,10 +21,7 @@ def my_check_call(verbose: bool, command_line: List[str], **kwargs) -> None:
 
     r = subprocess.run(command_line,
                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
-    if r.returncode == 0:
-        if verbose:
-            print(r.stderr.decode().strip())
-    else:
+    if r.returncode != 0:
         raise EPTestingException(
             f'Command {command_line} failed with exit status {r.returncode}!\n'
             'stderr:\n'
@@ -32,6 +29,8 @@ def my_check_call(verbose: bool, command_line: List[str], **kwargs) -> None:
             '\n\n'
             'stdout:\n'
             f'{r.stdout.decode().strip()}')
+    elif verbose:
+        print(r.stderr.decode().strip())
 
 
 class TestPythonAPIAccess(BaseTest):
@@ -92,7 +91,7 @@ def make_build_dir_and_build(cmake_build_dir: str, verbose: bool, this_os: int, 
         command_line = ['cmake', '..']
         if this_os == OS.Windows:
             if bitness not in ['x32', 'x64']:
-                 raise EPTestingException('Bad bitness sent to make_build_dir_and_build, should be x32 or x64')
+                raise EPTestingException('Bad bitness sent to make_build_dir_and_build, should be x32 or x64')
             if msvc_version == 15:
                 if bitness == 'x64':
                     command_line.extend(['-G', 'Visual Studio 15 Win64'])
