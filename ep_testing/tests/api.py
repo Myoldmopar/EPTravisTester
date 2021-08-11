@@ -21,8 +21,9 @@ def my_check_call(verbose: bool, command_line: List[str], **kwargs) -> None:
 
     r = subprocess.run(command_line,
                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
-    if r.returncode == 0 and verbose:
-        print(r.stderr.decode().strip())
+    if r.returncode == 0:
+        if verbose:
+            print(r.stderr.decode().strip())
     else:
         raise EPTestingException(
             f'Command {command_line} failed with exit status {r.returncode}!\n'
