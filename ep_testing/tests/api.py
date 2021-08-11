@@ -1,4 +1,5 @@
 import os
+import sys
 import platform
 import subprocess
 from tempfile import mkdtemp, mkstemp
@@ -62,12 +63,15 @@ class TestPythonAPIAccess(BaseTest):
             f.write(self._api_script_content(install_root))
         print(' [FILE WRITTEN] ', end='')
         try:
-            if platform.system() == 'Linux':
-                py = 'python3'
-            elif platform.system() == 'Darwin':
-                py = '/usr/local/bin/python3'
-            else:  # windows
-                py = 'C:\\Python36\\Python.exe'
+            # TODO: why do we have to pass the full path to python on darwin/Windows but not linux?
+            # Anyhoo, let's just use sys.executable everywhere
+            # if platform.system() == 'Linux':
+            #     py = 'python3'
+            # elif platform.system() == 'Darwin':
+            #     py = '/usr/local/bin/python3'
+            # else:  # windows
+            #    py = 'C:\\Python36\\Python.exe'
+            py = sys.executable
             my_env = os.environ.copy()
             if self.os == OS.Windows:  # my local comp didn't have cmake in path except in interact shells
                 my_env["PATH"] = install_root + ";" + my_env["PATH"]
