@@ -33,12 +33,18 @@ CONFIGURATIONS = {
 
 class TestConfiguration:
 
-    def __init__(self, run_config_key):
+    def __init__(self, run_config_key, msvc_version=None):
 
         # invalid keys are protected in the command's finalize_options method
         this_config = CONFIGURATIONS[run_config_key]
         self.os_version = this_config['os_version']
         self.os = this_config['os']
+        self.msvc_version = None
+        if msvc_version is not None:
+            self.msvc_version = msvc_version
+        elif self.os == OS.Windows:
+            self.msvc_version = 15  # Default to 2017 for Travis
+
         self.asset_pattern = this_config['asset_pattern']
         self.bitness = this_config['bitness']
 

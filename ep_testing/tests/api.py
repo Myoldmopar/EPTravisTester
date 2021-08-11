@@ -82,7 +82,7 @@ class TestPythonAPIAccess(BaseTest):
             raise e
 
 
-def make_build_dir_and_build(cmake_build_dir: str, verbose: bool, this_os: int, bitness: str):
+def make_build_dir_and_build(cmake_build_dir: str, verbose: bool, this_os: int, bitness: str, msvc_version: int):
     try:
         os.makedirs(cmake_build_dir)
         my_env = os.environ.copy()
@@ -90,12 +90,27 @@ def make_build_dir_and_build(cmake_build_dir: str, verbose: bool, this_os: int, 
             my_env["PATH"] = "/usr/local/bin:" + my_env["PATH"]
         command_line = ['cmake', '..']
         if this_os == OS.Windows:
-            if bitness == 'x64':
-                command_line.extend(['-G', 'Visual Studio 15 Win64'])
-            elif bitness == 'x32':
-                command_line.extend(['-G', 'Visual Studio 15'])  # defaults to 32
+            if bitness not in ['x32', 'x64']:
+                 raise EPTestingException('Bad bitness sent to make_build_dir_and_build, should be x32 or x64')
+            if msvc_version == 15:
+                if bitness == 'x64':
+                    command_line.extend(['-G', 'Visual Studio 15 Win64'])
+                elif bitness == 'x32':
+                    command_line.extend(['-G', 'Visual Studio 15'])  # defaults to 32
+            elif msvc_version == 16:
+                if bitness == 'x64':
+                    command_line.extend(['-G', 'Visual Studio 16 2019', '-A', 'x64'])  # default to 64, but be explicit
+                elif bitness == 'x32':
+                    command_line.extend(['-G', 'Visual Studio 16 2019', '-A', 'x86'])
+
+            elif msvc_version == 17:
+                if bitness == 'x64':
+                    command_line.extend(['-G', 'Visual Studio 17 2022', '-A', 'x64'])  # default to 64, but be explicit
+                elif bitness == 'x32':
+                    command_line.extend(['-G', 'Visual Studio 17 2022', '-A', 'x86'])
             else:
-                raise EPTestingException('Bad bitness sent to make_build_dir_and_build')
+                raise EPTestingException("Unknown msvc_version passed to make_build_dir_and_build")
+
         my_check_call(verbose, command_line, cwd=cmake_build_dir, env=my_env)
         command_line = ['cmake', '--build', '.']
         if platform.system() == 'Windows':
@@ -115,6 +130,7 @@ class TestCAPIAccess(BaseTest):
         self.bitness = None
         self.source_file_name = 'func.c'
         self.target_name = 'TestCAPIAccess'
+        self.msvc_version = None
 
     def name(self):
         return 'Test running an API script against energyplus in C'
@@ -155,6 +171,7 @@ class TestCAPIAccess(BaseTest):
             raise EPTestingException('Bad call to %s -- must pass bitness in kwargs' % self.__class__.__name__)
         self.os = kwargs['os']
         self.bitness = kwargs['bitness']
+        self.msvc_version = kwargs['msvc_version']
         build_dir = mkdtemp()
         c_file_name = self.source_file_name
         c_file_path = os.path.join(build_dir, c_file_name)
@@ -170,7 +187,7 @@ class TestCAPIAccess(BaseTest):
             f.write(self._api_fixup_content())
         print(' [FIXUP CMAKE WRITTEN] ', end='')
         cmake_build_dir = os.path.join(build_dir, 'build')
-        make_build_dir_and_build(cmake_build_dir, self.verbose, self.os, self.bitness)
+        make_build_dir_and_build(cmake_build_dir, self.verbose, self.os, self.bitness, self.msvc_version)
         try:
             new_binary_path = os.path.join(cmake_build_dir, self.target_name)
             if self.os == OS.Windows:  # override the path/name for Windows
@@ -191,6 +208,7 @@ class TestCppAPIDelayedAccess(BaseTest):
         self.bitness = None
         self.source_file_name = 'func.cpp'
         self.target_name = 'TestCAPIAccess'
+        self.msvc_version = None
 
     def name(self):
         return 'Test running an API script against energyplus in C++ but with delayed DLL loading'
@@ -229,6 +247,7 @@ class TestCppAPIDelayedAccess(BaseTest):
             raise EPTestingException('Bad call to %s -- must pass bitness in kwargs' % self.__class__.__name__)
         self.os = kwargs['os']
         self.bitness = kwargs['bitness']
+        self.msvc_version = kwargs['msvc_version']
         build_dir = mkdtemp()
         c_file_name = 'func.cpp'
         c_file_path = os.path.join(build_dir, c_file_name)
@@ -243,7 +262,7 @@ class TestCppAPIDelayedAccess(BaseTest):
             f.write(self._api_cmakelists_content())
         print(' [CMAKE FILE WRITTEN] ', end='')
         cmake_build_dir = os.path.join(build_dir, 'build')
-        make_build_dir_and_build(cmake_build_dir, self.verbose, self.os, self.bitness)
+        make_build_dir_and_build(cmake_build_dir, self.verbose, self.os, self.bitness, self.msvc_version)
         if platform.system() == 'Windows':
             built_binary_path = os.path.join(cmake_build_dir, 'Release', 'TestCAPIAccess')
         else:
