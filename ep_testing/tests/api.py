@@ -1,6 +1,7 @@
 import os
+import sys
 import platform
-from subprocess import check_call, CalledProcessError, STDOUT
+import subprocess
 from tempfile import mkdtemp, mkstemp
 from typing import List
 
@@ -17,11 +18,19 @@ def api_resource_dir() -> str:
 
 
 def my_check_call(verbose: bool, command_line: List[str], **kwargs) -> None:
-    if verbose:
-        check_call(command_line, **kwargs)
-    else:
-        with open(os.devnull, 'w') as dev_null:
-            check_call(command_line, stdout=dev_null, stderr=STDOUT, **kwargs)
+
+    r = subprocess.run(command_line,
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
+    if r.returncode != 0:
+        raise EPTestingException(
+            f'Command {command_line} failed with exit status {r.returncode}!\n'
+            'stderr:\n'
+            f'{r.stderr.decode().strip()}'
+            '\n\n'
+            'stdout:\n'
+            f'{r.stdout.decode().strip()}')
+    elif verbose:
+        print(r.stderr.decode().strip())
 
 
 class TestPythonAPIAccess(BaseTest):
@@ -54,22 +63,26 @@ class TestPythonAPIAccess(BaseTest):
             f.write(self._api_script_content(install_root))
         print(' [FILE WRITTEN] ', end='')
         try:
-            if platform.system() == 'Linux':
-                py = 'python3'
-            elif platform.system() == 'Darwin':
-                py = '/usr/local/bin/python3'
-            else:  # windows
-                py = 'C:\\Python36\\Python.exe'
+            # TODO: why do we have to pass the full path to python on darwin/Windows but not linux?
+            # Anyhoo, let's just use sys.executable everywhere
+            # if platform.system() == 'Linux':
+            #     py = 'python3'
+            # elif platform.system() == 'Darwin':
+            #     py = '/usr/local/bin/python3'
+            # else:  # windows
+            #    py = 'C:\\Python36\\Python.exe'
+            py = sys.executable
             my_env = os.environ.copy()
             if self.os == OS.Windows:  # my local comp didn't have cmake in path except in interact shells
                 my_env["PATH"] = install_root + ";" + my_env["PATH"]
             my_check_call(self.verbose, [py, python_file_path], env=my_env)
             print(' [DONE]!')
-        except CalledProcessError:
-            raise EPTestingException('Python API Wrapper Script failed!')
+        except EPTestingException as e:
+            print('Python API Wrapper Script failed!')
+            raise e
 
 
-def make_build_dir_and_build(cmake_build_dir: str, verbose: bool, this_os: int, bitness: str):
+def make_build_dir_and_build(cmake_build_dir: str, verbose: bool, this_os: int, bitness: str, msvc_version: int):
     try:
         os.makedirs(cmake_build_dir)
         my_env = os.environ.copy()
@@ -77,21 +90,36 @@ def make_build_dir_and_build(cmake_build_dir: str, verbose: bool, this_os: int, 
             my_env["PATH"] = "/usr/local/bin:" + my_env["PATH"]
         command_line = ['cmake', '..']
         if this_os == OS.Windows:
-            if bitness == 'x64':
-                command_line.extend(['-G', 'Visual Studio 15 Win64'])
-            elif bitness == 'x32':
-                command_line.extend(['-G', 'Visual Studio 15'])  # defaults to 32
+            if bitness not in ['x32', 'x64']:
+                raise EPTestingException('Bad bitness sent to make_build_dir_and_build, should be x32 or x64')
+            if msvc_version == 15:
+                if bitness == 'x64':
+                    command_line.extend(['-G', 'Visual Studio 15 Win64'])
+                elif bitness == 'x32':
+                    command_line.extend(['-G', 'Visual Studio 15'])  # defaults to 32
+            elif msvc_version == 16:
+                if bitness == 'x64':
+                    command_line.extend(['-G', 'Visual Studio 16 2019', '-A', 'x64'])  # default to 64, but be explicit
+                elif bitness == 'x32':
+                    command_line.extend(['-G', 'Visual Studio 16 2019', '-A', 'x86'])
+
+            elif msvc_version == 17:
+                if bitness == 'x64':
+                    command_line.extend(['-G', 'Visual Studio 17 2022', '-A', 'x64'])  # default to 64, but be explicit
+                elif bitness == 'x32':
+                    command_line.extend(['-G', 'Visual Studio 17 2022', '-A', 'x86'])
             else:
-                raise EPTestingException('Bad bitness sent to make_build_dir_and_build')
+                raise EPTestingException("Unknown msvc_version passed to make_build_dir_and_build")
+
         my_check_call(verbose, command_line, cwd=cmake_build_dir, env=my_env)
         command_line = ['cmake', '--build', '.']
         if platform.system() == 'Windows':
             command_line.extend(['--config', 'Release'])
         my_check_call(verbose, command_line, env=my_env, cwd=cmake_build_dir)
         print(' [COMPILED] ', end='')
-    except CalledProcessError:
+    except EPTestingException as e:
         print("C API Wrapper Compilation Failed!")
-        raise
+        raise e
 
 
 class TestCAPIAccess(BaseTest):
@@ -102,6 +130,7 @@ class TestCAPIAccess(BaseTest):
         self.bitness = None
         self.source_file_name = 'func.c'
         self.target_name = 'TestCAPIAccess'
+        self.msvc_version = None
 
     def name(self):
         return 'Test running an API script against energyplus in C'
@@ -142,6 +171,7 @@ class TestCAPIAccess(BaseTest):
             raise EPTestingException('Bad call to %s -- must pass bitness in kwargs' % self.__class__.__name__)
         self.os = kwargs['os']
         self.bitness = kwargs['bitness']
+        self.msvc_version = kwargs['msvc_version']
         build_dir = mkdtemp()
         c_file_name = self.source_file_name
         c_file_path = os.path.join(build_dir, c_file_name)
@@ -157,16 +187,16 @@ class TestCAPIAccess(BaseTest):
             f.write(self._api_fixup_content())
         print(' [FIXUP CMAKE WRITTEN] ', end='')
         cmake_build_dir = os.path.join(build_dir, 'build')
-        make_build_dir_and_build(cmake_build_dir, self.verbose, self.os, self.bitness)
+        make_build_dir_and_build(cmake_build_dir, self.verbose, self.os, self.bitness, self.msvc_version)
         try:
             new_binary_path = os.path.join(cmake_build_dir, self.target_name)
             if self.os == OS.Windows:  # override the path/name for Windows
                 new_binary_path = os.path.join(cmake_build_dir, 'Release', self.target_name + '.exe')
             command_line = [new_binary_path]
             my_check_call(self.verbose, command_line, cwd=install_root)
-        except CalledProcessError:
+        except EPTestingException as e:
             print('C API Wrapper Execution failed!')
-            raise
+            raise e
         print(' [DONE]!')
 
 
@@ -178,6 +208,7 @@ class TestCppAPIDelayedAccess(BaseTest):
         self.bitness = None
         self.source_file_name = 'func.cpp'
         self.target_name = 'TestCAPIAccess'
+        self.msvc_version = None
 
     def name(self):
         return 'Test running an API script against energyplus in C++ but with delayed DLL loading'
@@ -216,6 +247,7 @@ class TestCppAPIDelayedAccess(BaseTest):
             raise EPTestingException('Bad call to %s -- must pass bitness in kwargs' % self.__class__.__name__)
         self.os = kwargs['os']
         self.bitness = kwargs['bitness']
+        self.msvc_version = kwargs['msvc_version']
         build_dir = mkdtemp()
         c_file_name = 'func.cpp'
         c_file_path = os.path.join(build_dir, c_file_name)
@@ -230,7 +262,7 @@ class TestCppAPIDelayedAccess(BaseTest):
             f.write(self._api_cmakelists_content())
         print(' [CMAKE FILE WRITTEN] ', end='')
         cmake_build_dir = os.path.join(build_dir, 'build')
-        make_build_dir_and_build(cmake_build_dir, self.verbose, self.os, self.bitness)
+        make_build_dir_and_build(cmake_build_dir, self.verbose, self.os, self.bitness, self.msvc_version)
         if platform.system() == 'Windows':
             built_binary_path = os.path.join(cmake_build_dir, 'Release', 'TestCAPIAccess')
         else:
@@ -240,7 +272,7 @@ class TestCppAPIDelayedAccess(BaseTest):
             my_env["PATH"] = install_root + ";" + my_env["PATH"]
         try:
             my_check_call(self.verbose, [built_binary_path], env=my_env)
-        except CalledProcessError:
+        except EPTestingException as e:
             print("Delayed C API Wrapper execution failed")
-            raise
+            raise e
         print(' [DONE]!')
