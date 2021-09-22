@@ -1,6 +1,6 @@
 import os
 from subprocess import check_call, CalledProcessError, STDOUT
-import urllib.request
+import requests
 
 from ep_testing.exceptions import EPTestingException
 from ep_testing.tests.base import BaseTest
@@ -31,7 +31,9 @@ class TransitionOldFile(BaseTest):
         idf_path = os.path.join(transition_dir, test_file)
         dev_null = open(os.devnull, 'w')
         try:
-            _, headers = urllib.request.urlretrieve(idf_url, idf_path)
+            r = requests.get(idf_url)
+            with open(idf_path, 'wb') as f:
+                f.write(r.content)
         except Exception as e:
             raise EPTestingException('Could not download file from prior release at %s; error: %s' % (idf_url, str(e)))
         try:
