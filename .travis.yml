@@ -15,11 +15,11 @@ jobs:
     python: 3.6
     before_script: pip3 install -r requirements.txt
     script: python3 setup.py run --run-config ubuntu2004
-  - os: osx
-    name: Mac 10.14 E+ Tests
-    osx_image: xcode11.3
-    before_script: pip3 install -r requirements.txt
-    script: python3 setup.py run --run-config mac1014
+#  - os: osx
+#    name: Mac 10.14 E+ Tests
+#    osx_image: xcode11.3
+#    before_script: pip3 install -r requirements.txt
+#    script: python3 setup.py run --run-config mac1014
   - os: osx
     name: Mac 10.15 E+ Tests
     osx_image: xcode11.4
