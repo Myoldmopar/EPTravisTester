@@ -25,11 +25,11 @@ jobs:
     osx_image: xcode11.4
     before_script: pip3 install -r requirements.txt
     script: python3 setup.py run --run-config mac1015
-#  - os: osx  -- add when Travis has Mac 11.6, or downgrade our Mac 11 image
-#    name: Mac 11.1 E+ Tests
-#    osx_image: xcode12.3  -- something else
-#    before_script: pip3 install -r requirements.txt
-#    script: python3 setup.py run --run-config mac11SOMETHING
+  - os: osx
+    name: Mac 11.1 E+ Tests
+    osx_image: xcode12.3
+    before_script: pip3 install -r requirements.txt
+    script: python3 setup.py run --run-config mac11
   - os: windows
     language: cpp
     name: Windows 32-bit E+ Tests

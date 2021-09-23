@@ -22,9 +22,9 @@ CONFIGURATIONS = {
     'mac1015': {
         'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS10.15-x86_64.tar.gz', 'os_version': '10.15'
     },  # 10.15 on 10.15
-    # 'mac1101': {
-    #     'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS11.15-x86_64.tar.gz', 'os_version': '10.15'
-    # },  # 10.15 on 10.15
+    'mac11': {
+        'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS10.15-x86_64.tar.gz', 'os_version': '10.15'
+    },  # 10.15 on 11
     'win32': {
         'os': OS.Windows, 'bitness': 'x32', 'asset_pattern': 'Windows-i386.zip', 'os_version': '10'
     },
