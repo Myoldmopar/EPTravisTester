@@ -87,9 +87,9 @@ class Downloader:
             if release['tag_name'] == self.release_tag:
                 self._my_print('Found release with tag_name = ' + self.release_tag)
                 return release
-        raise EPTestingException('Did not find matching tag, searching for %s, full list = [%s\n]' % (
+        raise EPTestingException('Did not find matching tag, searching for %s, full list = [\n%s\n]' % (
             self.release_tag,
-            ['\n%s' % x for x in full_list_of_release_names]
+            '\n '.join(full_list_of_release_names)
         ))
 
     @staticmethod
