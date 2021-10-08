@@ -1,10 +1,10 @@
 import os
-from tempfile import mkdtemp
 
 from ep_testing.config import TestConfiguration, OS
 from ep_testing.tests.api import TestPythonAPIAccess, TestCAPIAccess, TestCppAPIDelayedAccess
 from ep_testing.tests.energyplus import TestPlainDDRunEPlusFile
 from ep_testing.tests.expand_objects import TestExpandObjectsAndRun
+from ep_testing.tests.hvacdiagram import HVACDiagram
 from ep_testing.tests.transition import TransitionOldFile
 
 
@@ -17,9 +17,6 @@ class Tester:
 
     def run(self):
         saved_path = os.getcwd()
-        temp_dir = mkdtemp()
-        print('Creating sandbox dir and changing to it: ' + temp_dir)
-        os.chdir(temp_dir)
         TestPlainDDRunEPlusFile().run(
             self.install_path, self.verbose, {'test_file': '1ZoneUncontrolled.idf'}
         )
@@ -31,6 +28,9 @@ class Tester:
         )
         TransitionOldFile().run(
             self.install_path, self.verbose, {'last_version': self.config.tag_last_version}
+        )
+        HVACDiagram().run(
+            self.install_path, self.verbose, {}
         )
         if self.config.os == OS.Windows:
             print("Windows Symlink runs are not testable on Travis, I think the user needs symlink privilege.")
@@ -49,7 +49,7 @@ class Tester:
         if self.config.bitness == 'x32':
             print("Travis does not have a 32-bit Python package readily available, so not testing Python API")
         elif self.config.os == OS.Mac and self.config.os_version == '10.14':
-            print("E+ technically supports 10.15, but most things work on 10.14. Not Python API though, skipping that.")
+            print("E+ technically supports 10.15, and most things work on 10.14. Not Python API though, skipping that.")
         else:
             TestPythonAPIAccess().run(
                 self.install_path, self.verbose, {'os': self.config.os}

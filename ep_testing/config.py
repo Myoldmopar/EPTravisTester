@@ -57,8 +57,11 @@ class TestConfiguration:
         self.tag_last_version = 'v9.5.0'
 
         # If this is turned on, it expects to find an asset already downloaded at the specified location
-        self.skip_download = False
-        self.skipped_download_file = '/tmp/ep.tar.gz'
+        self.skip_download = True
+        if self.os == OS.Windows:
+            self.skipped_download_file = 'C:/tmp/ep.zip'
+        else:
+            self.skipped_download_file = '/tmp/ep.tar.gz'
 
         # But if we are on Travis, we override it to always download a new asset
         if os.environ.get('TRAVIS'):

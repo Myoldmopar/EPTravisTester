@@ -75,7 +75,8 @@ class TestPythonAPIAccess(BaseTest):
             my_env = os.environ.copy()
             if self.os == OS.Windows:  # my local comp didn't have cmake in path except in interact shells
                 my_env["PATH"] = install_root + ";" + my_env["PATH"]
-            my_check_call(self.verbose, [py, python_file_path], env=my_env)
+            idf_to_run = os.path.join(install_root, 'ExampleFiles', 'PythonPluginCustomOutputVariable.idf')
+            my_check_call(self.verbose, [py, python_file_path, '-D', idf_to_run], env=my_env)
             print(' [DONE]!')
         except EPTestingException as e:
             print('Python API Wrapper Script failed!')
