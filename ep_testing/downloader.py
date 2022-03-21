@@ -158,4 +158,3 @@ class Downloader:
             self.announce(message, level)
         else:
             print(message)
-
