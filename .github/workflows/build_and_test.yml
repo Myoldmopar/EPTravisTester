@@ -15,9 +15,9 @@ jobs:
             key: mac11
           - os: windows-2019
             key: win64
-          - os: windows-2019
-            key: win32
-#          - os: windows-2022
+#          - os: windows-2019  -- GitHub Action image doesn't have 32-bit compiler by default, remove 32-bit soon, ok?
+#            key: win32
+#          - os: windows-2022  -- just need to add this sometime
 #            key: win64
     runs-on: ${{ matrix.os }}
     env:
