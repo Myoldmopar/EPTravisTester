@@ -1,7 +1,3 @@
-import os
-import shutil
-from tempfile import mkdtemp
-
 
 class OS:
     Windows = 1
@@ -51,23 +47,7 @@ class TestConfiguration:
         self.asset_pattern = this_config['asset_pattern']
         self.bitness = this_config['bitness']
 
-        self.this_version = '9.6'
-        self.tag_this_version = 'v9.6.0'
-        self.last_version = '9.5'
-        self.tag_last_version = 'v9.5.0'
-
-        # If this is turned on, it expects to find an asset already downloaded at the specified location
-        self.skip_download = False
-        self.skipped_download_file = '/tmp/ep.tar.gz'
-
-        # But if we are on Travis, we override it to always download a new asset
-        if os.environ.get('TRAVIS'):
-            self.skip_download = False
-
-        self.download_dir = mkdtemp()
-        if self.skip_download:
-            target_file_name = 'ep.tar.gz'
-            if self.os == OS.Windows:
-                target_file_name = 'ep.zip'
-            file_path = os.path.join(self.download_dir, target_file_name)
-            shutil.copy(self.skipped_download_file, file_path)
+        self.this_version = '22.1'
+        self.tag_this_version = 'v22.1.0-IOFreeze'
+        self.last_version = '9.6'
+        self.tag_last_version = 'v9.6.0'

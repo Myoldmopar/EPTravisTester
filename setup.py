@@ -1,4 +1,6 @@
+from os import path
 from setuptools import setup
+from tempfile import mkdtemp
 import distutils.cmd
 import distutils.log
 from ep_testing.downloader import Downloader
@@ -24,17 +26,24 @@ class Runner(distutils.cmd.Command):
     user_options = [
         # The format is (long option, short option, description).
         ('run-config=', None, 'Run configuration, see possible options in config.py'),
-        ('extracted-install-path=', 'x',
-         'Specifies a path where E+ is extracted to skip downloading it (path to root folder with energyplus.exe'),
+        ('use-local-copy=', 'x',
+         'Specifies a path to a local E+ copy for testing, either a path to an archive, or an extracted directory'),
         ('msvc-version=', None,
          'For OS.Windows only, specifies a MSVC generator to use. 15 is default, you can override to 16'),
         # distutils is already claiming --verbose and setting it as default = 1
         ('verbose-output', None, 'Enable verbose mode'),
     ]
 
+    def __init__(self, dist):
+        super().__init__(dist)
+        self.run_config = None
+        self.use_local_copy = None
+        self.msvc_version = None
+        self.verbose_output = None
+
     def initialize_options(self):
         self.run_config = None
-        self.extracted_install_path = None
+        self.use_local_copy = None
         self.msvc_version = None
         self.verbose_output = None
 
@@ -60,18 +69,36 @@ class Runner(distutils.cmd.Command):
 
         c = TestConfiguration(self.run_config, self.msvc_version)
         self.announce('Attempting to test tag name: %s' % c.tag_this_version, level=distutils.log.INFO)
-        if self.extracted_install_path is None:
-            d = Downloader(c, self.announce)
-            self.extracted_install_path = d.extracted_install_path()
-            self.announce(f'EnergyPlus package extracted to: {self.extracted_install_path}', level=distutils.log.INFO)
+        download_dir: str = mkdtemp()
+        local_copy: str = self.use_local_copy
+        if local_copy is None:
+            d = Downloader(c, download_dir, announce=self.announce)
+            local_copy = d.extracted_install_path
+            self.announce(f'EnergyPlus package extracted to: {local_copy}', level=distutils.log.INFO)
         else:
-            self.announce(f'Using specified EnergyPlus package extracted at: {self.extracted_install_path}',
-                          level=distutils.log.INFO)
-        t = Tester(c, self.extracted_install_path, self.verbose_output)
+            if path.isdir(local_copy):
+                # in this case local copy is already an extracted dir, no need to do anything, just test
+                self.announce(f'Using local EnergyPlus package extracted at: {local_copy}', level=distutils.log.INFO)
+            elif path.isfile(local_copy):
+                self.announce(f'Using local EnergyPlus archive at {local_copy}', level=distutils.log.INFO)
+                # this call will skip downloading, but it will extract it to a new directory
+                d = Downloader(c, download_dir, use_local=local_copy, announce=self.announce)
+                local_copy = d.extracted_install_path
+            else:
+                self.announce(
+                    f'Trying to use local copy at {local_copy}, but it does not exist!  Aborting...',
+                    level=distutils.log.INFO
+                )
+                return
+        t = Tester(c, local_copy, self.verbose_output)
         # unhandled exceptions should cause this to fail
         t.run()
 
 
+# the cmdclass entry below is expecting a Mapping[str, Type(Command)], which is essentially what we have with our
+# inherited Command class above, but for whatever reason, the type inference engine is complaining, so I'm ignoring that
+# inspection for this one declaration
+# noinspection PyTypeChecker
 setup(
     name='EPSanityTester',
     version='0.2',
