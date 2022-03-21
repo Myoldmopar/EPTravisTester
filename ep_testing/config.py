@@ -39,8 +39,7 @@ class TestConfiguration:
         if msvc_version is not None:
             self.msvc_version = msvc_version
         elif self.os == OS.Windows:
-            self.msvc_version = 15  # Default to 2017 for Travis
-
+            self.msvc_version = 16  # Default to 2017 for Travis
         self.asset_pattern = this_config['asset_pattern']
         self.bitness = this_config['bitness']
 

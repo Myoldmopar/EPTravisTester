@@ -29,7 +29,7 @@ class Runner(distutils.cmd.Command):
         ('use-local-copy=', 'x',
          'Specifies a path to a local E+ copy for testing, either a path to an archive, or an extracted directory'),
         ('msvc-version=', None,
-         'For OS.Windows only, specifies a MSVC generator to use. 15 is default, you can override to 16'),
+         'For OS.Windows only, specifies a MSVC generator to use. 16 is default, you can override'),
         # distutils is already claiming --verbose and setting it as default = 1
         ('verbose-output', None, 'Enable verbose mode'),
     ]
@@ -58,7 +58,7 @@ class Runner(distutils.cmd.Command):
             try:
                 self.msvc_version = int(self.msvc_version)
             except ValueError:
-                raise Exception("Parameter --msvc_version should be an int like 15 (2017) or 16 (2019)")
+                raise Exception("Parameter --msvc_version should be an int like 16 (for VS 2019)")
 
         if self.verbose_output is None:
             self.verbose_output = False
