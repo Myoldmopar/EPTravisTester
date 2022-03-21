@@ -12,9 +12,6 @@ CONFIGURATIONS = {
     'ubuntu2004': {
         'os': OS.Linux, 'bitness': 'x64', 'asset_pattern': 'Linux-Ubuntu20.04-x86_64.tar.gz', 'os_version': '20.04'
     },
-    # 'mac1014': {
-    #     'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS10.15-x86_64.tar.gz', 'os_version': '10.14'
-    # },  # 10.15 on 10.14
     'mac1015': {
         'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS10.15-x86_64.tar.gz', 'os_version': '10.15'
     },  # 10.15 on 10.15

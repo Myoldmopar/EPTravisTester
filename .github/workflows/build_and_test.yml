@@ -7,8 +7,18 @@ jobs:
         include:
           - os: ubuntu-18.04
             key: ubuntu1804
-#          - os: ubuntu-20.04
-#            key: ubuntu2004
+          - os: ubuntu-20.04
+            key: ubuntu2004
+          - os: macos-10.15
+            key: mac1015
+          - os: macos-11
+            key: mac11
+          - os: windows-2019
+            key: win64
+          - os: windows-2019
+            key: win32
+#          - os: windows-2022
+#            key: win64
     runs-on: ${{ matrix.os }}
     env:
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -21,43 +31,3 @@ jobs:
         run: pip3 install -r requirements.txt
       - name: Run Tests
         run: python3 setup.py run --run-config ${{ matrix.key }}
-#  - os: osx
-#    name: Mac 10.14 E+ Tests
-#    osx_image: xcode11.3
-#    before_script: pip3 install -r requirements.txt
-#    script: python3 setup.py run --run-config mac1014
-
-
-#  - os: osx
-#    name: Mac 10.15 E+ Tests
-#    osx_image: xcode11.4
-#    before_script: pip3 install -r requirements.txt
-#    script: python3 setup.py run --run-config mac1015
-#  - os: osx
-#    name: Mac 11.1 E+ Tests
-#    osx_image: xcode12.3
-#    before_script: pip3 install -r requirements.txt
-#    script: python3 setup.py run --run-config mac11
-#  - os: windows
-#    language: cpp
-#    name: Windows 32-bit E+ Tests
-#    before_script:
-#      - choco install python --version 3.6.8
-#      - pip3 install -r requirements.txt
-#    script: python setup.py run --run-config win32
-#    env: PATH=/c/Python36:/c/Python36/Scripts:$PATH
-#  - os: windows
-#    language: cpp
-#    name: Windows 64-bit E+ Tests
-#    before_script:
-#      - choco install python --version 3.6.8
-#      - pip3 install -r requirements.txt
-#    script: python setup.py run --run-config win64
-#    env: PATH=/c/Python36:/c/Python36/Scripts:$PATH
-#  - os: linux
-#    dist: bionic
-#    name: Flake8
-#    language: python
-#    python: 3.6
-#    before_script: pip3 install -r requirements.txt
-#    script: python3 setup.py flake8
