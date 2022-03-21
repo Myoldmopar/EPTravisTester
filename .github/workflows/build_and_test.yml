@@ -7,9 +7,11 @@ jobs:
         include:
           - os: ubuntu-18.04
             key: ubuntu1804
-          - os: ubuntu-20.04
-            key: ubuntu2004
+#          - os: ubuntu-20.04
+#            key: ubuntu2004
     runs-on: ${{ matrix.os }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
