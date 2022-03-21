@@ -18,7 +18,7 @@ jobs:
       - name: Install Dependencies
         run: pip3 install -r requirements.txt
       - name: Run Tests
-        run: python3 setup.py run --run-config {{ matrix.key }}
+        run: python3 setup.py run --run-config ${{ matrix.key }}
 #  - os: osx
 #    name: Mac 10.14 E+ Tests
 #    osx_image: xcode11.3
