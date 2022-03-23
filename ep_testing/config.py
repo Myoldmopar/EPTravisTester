@@ -16,7 +16,7 @@ CONFIGURATIONS = {
         'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS10.15-x86_64.tar.gz', 'os_version': '10.15'
     },  # 10.15 on 10.15
     'mac11': {
-        'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS10.15-x86_64.tar.gz', 'os_version': '10.15'
+        'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS11.6-x86_64.tar.gz', 'os_version': '11.0'
     },  # 10.15 on 11
     'win32': {
         'os': OS.Windows, 'bitness': 'x32', 'asset_pattern': 'Windows-i386.zip', 'os_version': '10'
@@ -44,6 +44,6 @@ class TestConfiguration:
         self.bitness = this_config['bitness']
 
         self.this_version = '22.1'
-        self.tag_this_version = 'v22.1.0-IOFreeze'
+        self.tag_this_version = 'v22.1.0-TestBuild2'
         self.last_version = '9.6'
         self.tag_last_version = 'v9.6.0'
