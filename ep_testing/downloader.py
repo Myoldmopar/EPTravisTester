@@ -4,6 +4,7 @@ import os
 import requests
 import shutil
 from subprocess import check_call, CalledProcessError, STDOUT
+from typing import Tuple
 import urllib.request
 
 from ep_testing.exceptions import EPTestingException
@@ -14,9 +15,9 @@ class Downloader:
     Release_url = 'https://api.github.com/repos/NREL/EnergyPlus/releases'
     User_url = 'https://api.github.com/user'
 
-    def __init__(self, config: TestConfiguration, announce: callable = None):
+    def __init__(self, config: TestConfiguration, download_dir: str, use_local: str = '', announce: callable = None):
         self.release_tag = config.tag_this_version
-        self.download_dir = config.download_dir
+        self.download_dir = download_dir
         self.announce = announce  # hijacking this instance method is mildly dangerous, like 1/5 danger stars
         github_token = os.environ.get('GITHUB_TOKEN', None)
         if github_token is None:
@@ -31,33 +32,38 @@ class Downloader:
             raise EPTestingException('Invalid call to Github API -- check GITHUB_TOKEN validity')
         self._my_print('Executing download operations as Github user: ' + user_response.json()['login'])
         extract_dir_name = 'ep_package'
-        self.extract_path = os.path.join(config.download_dir, extract_dir_name)
+        self.extract_path = os.path.join(self.download_dir, extract_dir_name)
         # need to adapt this to the new filename structure when we get there
         self.asset_pattern = config.asset_pattern
+        target_file_name, self.extract_command = self._get_extract_vars(config)
+        self.download_path = os.path.join(self.download_dir, target_file_name)
+        if use_local:
+            shutil.copy(use_local, self.download_dir)
+        else:
+            releases = self._get_all_packages()
+            matching_release = self._find_matching_release(releases)
+            asset = self._find_matching_asset_for_release(matching_release)
+            if asset is None:
+                raise EPTestingException('Could not find asset to download, has CI finished it yet?')
+            self._download_asset(asset)
+        self.extracted_install_path = self._extract_asset()
+
+    def _get_extract_vars(self, config) -> Tuple[str, str]:
+        target_file_name = ''
+        extract_command = ''
         if config.os == OS.Linux:
             target_file_name = 'ep.tar.gz'
             # tar -xzf ep.tar.gz -C ep_package
-            self.extract_command = ['tar', '-xzf', target_file_name, '-C', self.extract_path]
+            extract_command = ['tar', '-xzf', target_file_name, '-C', self.extract_path]
         elif config.os == OS.Mac:
             target_file_name = 'ep.tar.gz'
             # tar -xzf ep.tar.gz -C ep_package
-            self.extract_command = ['tar', '-xzf', target_file_name, '-C', self.extract_path]
+            extract_command = ['tar', '-xzf', target_file_name, '-C', self.extract_path]
         elif config.os == OS.Windows:
             target_file_name = 'ep.zip'
             # 7z x ep.zip -oep_package
-            self.extract_command = ['7z.exe', 'x', target_file_name, '-o' + self.extract_path]
-        releases = self._get_all_packages()
-        matching_release = self._find_matching_release(releases)
-        asset = self._find_matching_asset_for_release(matching_release)
-        if asset is None:
-            raise EPTestingException('Could not find asset to download, has CI finished it yet?')
-        self.download_path = os.path.join(config.download_dir, target_file_name)
-        if config.skip_download:
-            if not os.path.exists(self.download_path):
-                raise EPTestingException('Download skipped, but package not available at ' + self.download_path)
-        else:
-            self._download_asset(asset)
-        self._extracted_install_path = self._extract_asset()
+            extract_command = ['7z.exe', 'x', target_file_name, '-o' + self.extract_path]
+        return target_file_name, extract_command
 
     def _get_all_packages(self) -> List[dict]:
         """Get all releases from this url"""
@@ -155,6 +161,3 @@ class Downloader:
             self.announce(message, level)
         else:
             print(message)
-
-    def extracted_install_path(self) -> str:
-        return self._extracted_install_path
