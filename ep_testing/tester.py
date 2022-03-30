@@ -48,8 +48,6 @@ class Tester:
         )
         if self.config.bitness == 'x32':
             print("Travis does not have a 32-bit Python package readily available, so not testing Python API")
-        elif self.config.os == OS.Mac and self.config.os_version == '10.14':
-            print("E+ technically supports 10.15, but most things work on 10.14. Not Python API though, skipping that.")
         else:
             TestPythonAPIAccess().run(
                 self.install_path, self.verbose, {'os': self.config.os}

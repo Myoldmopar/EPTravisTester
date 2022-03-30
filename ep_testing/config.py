@@ -1,7 +1,3 @@
-import os
-import shutil
-from tempfile import mkdtemp
-
 
 class OS:
     Windows = 1
@@ -16,14 +12,11 @@ CONFIGURATIONS = {
     'ubuntu2004': {
         'os': OS.Linux, 'bitness': 'x64', 'asset_pattern': 'Linux-Ubuntu20.04-x86_64.tar.gz', 'os_version': '20.04'
     },
-    # 'mac1014': {
-    #     'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS10.15-x86_64.tar.gz', 'os_version': '10.14'
-    # },  # 10.15 on 10.14
     'mac1015': {
         'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS10.15-x86_64.tar.gz', 'os_version': '10.15'
     },  # 10.15 on 10.15
     'mac11': {
-        'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS10.15-x86_64.tar.gz', 'os_version': '10.15'
+        'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS11.6-x86_64.tar.gz', 'os_version': '11.0'
     },  # 10.15 on 11
     'win32': {
         'os': OS.Windows, 'bitness': 'x32', 'asset_pattern': 'Windows-i386.zip', 'os_version': '10'
@@ -46,28 +39,11 @@ class TestConfiguration:
         if msvc_version is not None:
             self.msvc_version = msvc_version
         elif self.os == OS.Windows:
-            self.msvc_version = 15  # Default to 2017 for Travis
-
+            self.msvc_version = 16  # Default to 2017 for Travis
         self.asset_pattern = this_config['asset_pattern']
         self.bitness = this_config['bitness']
 
-        self.this_version = '9.6'
-        self.tag_this_version = 'v9.6.0'
-        self.last_version = '9.5'
-        self.tag_last_version = 'v9.5.0'
-
-        # If this is turned on, it expects to find an asset already downloaded at the specified location
-        self.skip_download = False
-        self.skipped_download_file = '/tmp/ep.tar.gz'
-
-        # But if we are on Travis, we override it to always download a new asset
-        if os.environ.get('TRAVIS'):
-            self.skip_download = False
-
-        self.download_dir = mkdtemp()
-        if self.skip_download:
-            target_file_name = 'ep.tar.gz'
-            if self.os == OS.Windows:
-                target_file_name = 'ep.zip'
-            file_path = os.path.join(self.download_dir, target_file_name)
-            shutil.copy(self.skipped_download_file, file_path)
+        self.this_version = '22.1'
+        self.tag_this_version = 'v22.1.0'
+        self.last_version = '9.6'
+        self.tag_last_version = 'v9.6.0'
