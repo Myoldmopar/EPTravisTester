@@ -44,6 +44,6 @@ class TestConfiguration:
         self.bitness = this_config['bitness']
 
         self.this_version = '22.2'
-        self.tag_this_version = 'v22.2.0-RC3'
+        self.tag_this_version = 'v22.2.0'
         self.last_version = '22.1'
         self.tag_last_version = 'v22.1.0'
