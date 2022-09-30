@@ -6,18 +6,18 @@ class OS:
 
 
 CONFIGURATIONS = {
-    'ubuntu1804': {
-        'os': OS.Linux, 'bitness': 'x64', 'asset_pattern': 'Linux-Ubuntu18.04-x86_64.tar.gz', 'os_version': '18.04'
-    },
     'ubuntu2004': {
         'os': OS.Linux, 'bitness': 'x64', 'asset_pattern': 'Linux-Ubuntu20.04-x86_64.tar.gz', 'os_version': '20.04'
     },
-    'mac1015': {
-        'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS10.15-x86_64.tar.gz', 'os_version': '10.15'
-    },  # 10.15 on 10.15
+    'ubuntu2204': {
+        'os': OS.Linux, 'bitness': 'x64', 'asset_pattern': 'Linux-Ubuntu22.04-x86_64.tar.gz', 'os_version': '22.04'
+    },
     'mac11': {
-        'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS11.6-x86_64.tar.gz', 'os_version': '11.0'
-    },  # 10.15 on 11
+        'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS11.6-x86_64.tar.gz', 'os_version': '11.6'
+    },
+    'mac12': {
+        'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS12.1-x86_64.tar.gz', 'os_version': '12.1'
+    },
     'win32': {
         'os': OS.Windows, 'bitness': 'x32', 'asset_pattern': 'Windows-i386.zip', 'os_version': '10'
     },
@@ -43,7 +43,7 @@ class TestConfiguration:
         self.asset_pattern = this_config['asset_pattern']
         self.bitness = this_config['bitness']
 
-        self.this_version = '22.1'
-        self.tag_this_version = 'v22.1.0'
-        self.last_version = '9.6'
-        self.tag_last_version = 'v9.6.0'
+        self.this_version = '22.2'
+        self.tag_this_version = 'v22.2.0'
+        self.last_version = '22.1'
+        self.tag_last_version = 'v22.1.0'
