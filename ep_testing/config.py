@@ -18,6 +18,9 @@ CONFIGURATIONS = {
     'mac12': {
         'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS12.1-x86_64.tar.gz', 'os_version': '12.1'
     },
+    'mac12-arm64': {
+        'os': OS.Mac, 'bitness': 'arm64', 'asset_pattern': 'Darwin-macOS12.1-arm64.tar.gz', 'os_version': '12.1'
+    },
     'win32': {
         'os': OS.Windows, 'bitness': 'x32', 'asset_pattern': 'Windows-i386.zip', 'os_version': '10'
     },

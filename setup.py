@@ -15,10 +15,10 @@ class Runner(distutils.cmd.Command):
     * the path to where you extracted the tar.gz/zip manually, and,
     * on windows: the version of MSVC to use
 
-    eg: `python setup.py run --verbose_output
+    eg: `python setup.py run --verbose-output
                              --run-config win64
                              --msvc-version 16
-                             --extracted-install-path "path/to/EnergyPlus-9.6.0-ed3a9d36c8-Windows-x86_64"`
+                             --use-local-copy "path/to/EnergyPlus-9.6.0-ed3a9d36c8-Windows-x86_64"`
 
     """
 
