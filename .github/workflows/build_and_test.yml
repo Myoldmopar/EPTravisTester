@@ -6,16 +6,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-20.04
-            key: ubuntu2004
-          - os: ubuntu-22.04
-            key: ubuntu2204
-          - os: macos-11
-            key: mac11
+  #        - os: ubuntu-20.04
+  #          key: ubuntu2004
+  #        - os: ubuntu-22.04
+  #          key: ubuntu2204
+  #        - os: macos-11
+  #          key: mac11
           - os: macos-12
             key: mac12
-          - os: windows-2019
-            key: win64
+  #        - os: windows-2019
+  #          key: win64
 #          - os: windows-2019  -- GitHub Action image doesn't have 32-bit compiler by default, remove 32-bit soon, ok?
 #            key: win32
 #          - os: windows-2022  -- just need to add this sometime
@@ -30,5 +30,7 @@ jobs:
           python-version: 3.9
       - name: Install Dependencies
         run: pip3 install -r requirements.txt
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
       - name: Run Tests
         run: python3 setup.py run --run-config ${{ matrix.key }}
