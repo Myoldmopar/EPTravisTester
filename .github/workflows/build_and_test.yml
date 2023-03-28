@@ -18,8 +18,8 @@ jobs:
             key: win64
 #          - os: windows-2019  -- GitHub Action image doesn't have 32-bit compiler by default, remove 32-bit soon, ok?
 #            key: win32
-          - os: windows-2022
-            key: win64
+#          - os: windows-2022
+#            key: win64
     runs-on: ${{ matrix.os }}
     env:
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
