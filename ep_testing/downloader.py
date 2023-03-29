@@ -3,7 +3,7 @@ from typing import List, Union
 import os
 import requests
 import shutil
-from subprocess import check_call, CalledProcessError
+from subprocess import check_call, CalledProcessError, STDOUT
 from typing import Tuple
 import urllib.request
 
@@ -143,7 +143,10 @@ class Downloader:
         except Exception as e:
             raise EPTestingException('Could not create extraction path at %s; error: %s' % (self.extract_path, str(e)))
         try:
-            check_call(self.extract_command)
+            self._my_print("Extracting asset...")
+            dev_null = open(os.devnull, 'w')
+            check_call(self.extract_command, stdout=dev_null, stderr=STDOUT)
+            self._my_print(" ...Extraction Complete")
         except CalledProcessError as e:
             raise EPTestingException("Extraction failed with this error: " + str(e))
         # should result in a single new directory inside the extract path, like: /extract/path/EnergyPlus-V1-abc-Linux

@@ -18,6 +18,9 @@ CONFIGURATIONS = {
     'mac12': {
         'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS12.1-x86_64.tar.gz', 'os_version': '12.1'
     },
+    'mac12-arm64': {
+        'os': OS.Mac, 'bitness': 'arm64', 'asset_pattern': 'Darwin-macOS12.1-arm64.tar.gz', 'os_version': '12.1'
+    },
     'win32': {
         'os': OS.Windows, 'bitness': 'x32', 'asset_pattern': 'Windows-i386.zip', 'os_version': '10'
     },
@@ -43,7 +46,7 @@ class TestConfiguration:
         self.asset_pattern = this_config['asset_pattern']
         self.bitness = this_config['bitness']
 
-        self.this_version = '22.2'
-        self.tag_this_version = 'v22.2.0'
-        self.last_version = '22.1'
-        self.tag_last_version = 'v22.1.0'
+        self.this_version = '23.1'
+        self.tag_this_version = 'v23.1.0'
+        self.last_version = '22.2'
+        self.tag_last_version = 'v22.2.0'

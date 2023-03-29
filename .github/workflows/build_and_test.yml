@@ -3,6 +3,7 @@ on: push
 jobs:
   test:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-20.04
@@ -17,7 +18,7 @@ jobs:
             key: win64
 #          - os: windows-2019  -- GitHub Action image doesn't have 32-bit compiler by default, remove 32-bit soon, ok?
 #            key: win32
-#          - os: windows-2022  -- just need to add this sometime
+#          - os: windows-2022
 #            key: win64
     runs-on: ${{ matrix.os }}
     env:
@@ -29,5 +30,7 @@ jobs:
           python-version: 3.9
       - name: Install Dependencies
         run: pip3 install -r requirements.txt
+      #- name: Setup upterm session
+      #  uses: lhotari/action-upterm@v1
       - name: Run Tests
         run: python3 setup.py run --run-config ${{ matrix.key }}
