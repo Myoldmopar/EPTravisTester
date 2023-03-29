@@ -27,6 +27,9 @@ CONFIGURATIONS = {
     'win64': {
         'os': OS.Windows, 'bitness': 'x64', 'asset_pattern': 'Windows-x86_64.zip', 'os_version': '10'
     },
+    'win64-2022server': {
+        'os': OS.Windows, 'bitness': 'x64', 'asset_pattern': 'Windows-x86_64.zip', 'os_version': '2022'
+    },
 }
 
 
@@ -41,8 +44,10 @@ class TestConfiguration:
         self.msvc_version = None
         if msvc_version is not None:
             self.msvc_version = msvc_version
+        elif self.os == OS.Windows and self.os_version == '2022':
+            self.msvc_version = 17
         elif self.os == OS.Windows:
-            self.msvc_version = 16  # Default to 2017 for Travis
+            self.msvc_version = 16
         self.asset_pattern = this_config['asset_pattern']
         self.bitness = this_config['bitness']
 
