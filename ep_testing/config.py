@@ -51,7 +51,7 @@ class TestConfiguration:
         self.asset_pattern = this_config['asset_pattern']
         self.bitness = this_config['bitness']
 
-        self.this_version = '23.1'
-        self.tag_this_version = 'v23.1.0'
-        self.last_version = '22.2'
-        self.tag_last_version = 'v22.2.0'
+        self.this_version = '24.1'
+        self.tag_this_version = 'v24.1.0-TestBuildWithPython312'  # 'v24.1.0'
+        self.last_version = '23.2'
+        self.tag_last_version = 'v23.2.0'
