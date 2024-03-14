@@ -14,8 +14,10 @@ jobs:
             key: mac12
 #          - os: macos-13
 #            key: mac12
-          - os: macos-14
-            key: mac13-arm64
+          - os: macos-13
+            key: mac12-arm64
+#          - os: macos-14
+#            key: mac13-arm64
 #          - os: windows-2019
 #            key: win64
 #          - os: windows-2019  -- GitHub Action image doesn't have 32-bit compiler by default, remove 32-bit soon, ok?

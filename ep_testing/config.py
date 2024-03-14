@@ -18,6 +18,9 @@ CONFIGURATIONS = {
     'mac12': {
         'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS12.1-x86_64.tar.gz', 'os_version': '12.1'
     },
+    'mac12-arm64': {
+        'os': OS.Mac, 'bitness': 'arm64', 'asset_pattern': 'Darwin-macOS12.1-arm64.tar.gz', 'os_version': '12'
+    },
     'mac13-arm64': {
         'os': OS.Mac, 'bitness': 'arm64', 'asset_pattern': 'Darwin-macOS13-arm64.tar.gz', 'os_version': '13'
     },
@@ -52,6 +55,6 @@ class TestConfiguration:
         self.bitness = this_config['bitness']
 
         self.this_version = '24.1'
-        self.tag_this_version = 'v24.1.0-TestBuildWithPython312Again'  # 'v24.1.0'
+        self.tag_this_version = 'v24.1.0-IOFreeze'  # 'v24.1.0'
         self.last_version = '23.2'
         self.tag_last_version = 'v23.2.0'
