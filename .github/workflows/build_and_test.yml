@@ -32,8 +32,8 @@ jobs:
           python-version: '3.12'
       - name: Install Dependencies
         run: pip3 install -r requirements.txt
-#      - name: Setup tmate session
-#        uses: mxschmitt/action-tmate@v3
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
 #      - name: Setup upterm session
 #        uses: lhotari/action-upterm@v1
       - name: Run Tests
