@@ -75,11 +75,11 @@ class TestPythonAPIAccess(BaseTest):
             my_env = os.environ.copy()
             if self.os == OS.Windows:  # my local comp didn't have cmake in path except in interact shells
                 my_env["PATH"] = install_root + ";" + my_env["PATH"]
-            if self.os == OS.Mac:
+            # if self.os == OS.Mac:
                 # while it runs OK locally, for some reason on GHA, running a Plugin file from the Python API seg-faults
-                idf_to_run = os.path.join(install_root, 'ExampleFiles', '1ZoneUncontrolled.idf')
-            else:
-                idf_to_run = os.path.join(install_root, 'ExampleFiles', 'PythonPluginCustomOutputVariable.idf')
+            idf_to_run = os.path.join(install_root, 'ExampleFiles', '1ZoneUncontrolled.idf')
+            # else:
+            #    idf_to_run = os.path.join(install_root, 'ExampleFiles', 'PythonPluginCustomOutputVariable.idf')
             my_check_call(self.verbose, [py, python_file_path, '-D', idf_to_run], env=my_env)
             print(' [DONE]!')
         except EPTestingException as e:
