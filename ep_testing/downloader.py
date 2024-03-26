@@ -47,6 +47,8 @@ class Downloader:
                 raise EPTestingException('Could not find asset to download, has CI finished it yet?')
             self._download_asset(asset)
         self.extracted_install_path = self._extract_asset()
+        # if config.os == OS.Mac:  # TODO: JUST TEMPORARY!!
+        #     check_call(['codesign', '--remove-signature', self.extracted_install_path + "/Python"])
 
     def _get_extract_vars(self, config) -> Tuple[str, str]:
         target_file_name = ''
